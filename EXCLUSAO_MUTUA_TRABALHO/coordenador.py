@@ -6,11 +6,12 @@ from mensagens import *
 import queue
 import time
 
-connections = {}
+connections = {} # para guardar os sockets dos processos
 fila_pedidos = queue.Queue()  # fila de processos esperando
 atendimentos = {}  # {process_id: número de vezes atendido}
 rc_ocupada = False  # indica se a região crítica está ocupada
 lock_fila = threading.Lock()  # protege acesso à fila
+encerrar = False  # variável para encerrar o servidor
 
 # Configurar logging
 logging.basicConfig(
@@ -90,7 +91,7 @@ def listen_messages():
                     # libera próximo da fila
                     with lock_fila:
                         if not fila_pedidos.empty():
-                            prox = fila_pedidos.get()
+                            prox = fila_pedidos.get()  
                             rc_ocupada = True
                             enviar_grant(prox)
             
@@ -105,12 +106,15 @@ def enviar_grant(pid):
     connections[pid].send(msg)
 
 def interface_usuario():
-    print("[INTERFACE] Comandos disponíveis:")
-    print("1 - Mostrar fila de pedidos")
-    print("2 - Mostrar número de atendimentos por processo")
-    print("3 - Encerrar coordenador")
+    global encerrar 
+
+    while not encerrar:
+
+        print("[INTERFACE] Comandos disponíveis:")
+        print("1 - Mostrar fila de pedidos")
+        print("2 - Mostrar número de atendimentos por processo")
+        print("3 - Encerrar coordenador")
     
-    while True:
         comando = input("Digite um comando: ")
         
         if comando == "1":
@@ -124,10 +128,12 @@ def interface_usuario():
         elif comando == "3":
             logging.info("[SERVIDOR] Coordenador encerrado")
             print("\nEncerrando coordenador...")
-            exit(0)
+            encerrar = True
         
         else:
             print("Comando inválido.")
+
+        time.sleep(1)
 
 if __name__ == "__main__":
     iniciar_servidor()
@@ -143,5 +149,5 @@ if __name__ == "__main__":
     logging.info("[SERVIDOR] Coordenador pronto.")
     print("[SERVIDOR] Coordenador pronto.")
     
-    while True:
-        pass
+    while not encerrar:
+        time.sleep(1)

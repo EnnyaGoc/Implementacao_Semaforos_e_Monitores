@@ -29,22 +29,22 @@ def validar(n, r, arquivo="resultado.txt"):
     print(f"[VALIDAÇÃO] Linhas encontradas: {len(linhas)}")
 
     if len(linhas) != esperado:
-        print("❌ ERRO: número de linhas não confere!")
+        print("ERRO: número de linhas não confere!")
         return
 
-    print("✔ Número de linhas OK")
+    print("Número de linhas OK")
 
     # Validar timestamps crescentes
     anterior = None
     for linha in linhas:
         pid, dt = extrair_info(linha)
         if anterior and dt < anterior:
-            print("❌ ERRO: timestamps fora de ordem!")
+            print("ERRO: timestamps fora de ordem!")
             print("Linha:", linha)
             return
         anterior = dt
 
-    print("✔ Timestamps em ordem crescente")
+    print("Timestamps em ordem crescente")
 
     # Validar ocorrências de cada processo
     contagem = defaultdict(int)
@@ -57,11 +57,11 @@ def validar(n, r, arquivo="resultado.txt"):
         print(f"Processo {pid}: {contagem[pid]} vezes")
 
         if contagem[pid] != r:
-            print(f"❌ ERRO: Processo {pid} deveria aparecer {r} vezes!")
+            print(f"ERRO: Processo {pid} deveria aparecer {r} vezes!")
             return
 
-    print("\n✔ Todos os processos aparecem r vezes")
-    print("\n🎉 VALIDAÇÃO COMPLETA: TUDO CORRETO!")
+    print("\nTodos os processos aparecem r vezes")
+    print("\nVALIDAÇÃO COMPLETA: TUDO CORRETO!")
 
 
 if __name__ == "__main__":
